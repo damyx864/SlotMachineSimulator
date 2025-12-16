@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SlotSimulationInterviewApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SlotSimulationInterviewApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SlotSimulationInterviewApplication.class, args);
+    }
 
 }
