@@ -4,7 +4,10 @@ import org.example.slotsimulationinterview.slot.config.SlotMachineConfig;
 import org.example.slotsimulationinterview.slot.model.SpinResult;
 import org.springframework.stereotype.Service;
 
-import static org.example.slotsimulationinterview.slot.util.SlotUtil.*;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.computePayout;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.computeTotalWin;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.getNewBoard;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.getPayoutsAsMap;
 
 @Service
 public class SpinServiceImpl implements SpinService {
@@ -23,7 +26,6 @@ public class SpinServiceImpl implements SpinService {
         // Step 2: Compute the payoutTable
         var payouts = computePayout(board, bet, slotMachineConfig);
         // Step 3: Build and return the response Dto
-
         return SpinResult
                 .builder()
                 .board(board.spinSymbols())

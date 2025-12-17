@@ -10,9 +10,13 @@ public record Board(List<String> spinSymbols, BoardLayoutConfig boardLayoutConfi
     // Needed to perform the payline matching
     public List<String> getNormalizedSpinSymbols() {
         var normalizedSpinSymbols = new ArrayList<String>(boardLayoutConfig.nrOfEntries());
-        for (int i = 0; i < boardLayoutConfig.columns(); i++) {
-            for (int j = 0; j < boardLayoutConfig.rows(); j++) {
-                normalizedSpinSymbols.add(spinSymbols.get((i + j)));
+        int columns = boardLayoutConfig.columns();
+        int rows = boardLayoutConfig.rows();
+
+        for (int col = 0; col < columns; col++) {
+            for (int row = 0; row < rows; row++) {
+                int index = row * columns + col;
+                normalizedSpinSymbols.add(spinSymbols.get(index));
             }
         }
 

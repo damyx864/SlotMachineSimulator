@@ -1,39 +1,40 @@
 package org.example.slotsimulationinterview;
 
 import org.example.slotsimulationinterview.slot.config.BoardLayoutConfig;
+import org.example.slotsimulationinterview.slot.config.SlotMachineConfig;
 import org.example.slotsimulationinterview.slot.model.Board;
-import org.example.slotsimulationinterview.slot.service.SpinService;
 import org.example.slotsimulationinterview.slot.util.SlotUtil;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.computePayout;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.getNewBoard;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class SlotSimulationApplicationTests {
 
-    @Spy
-    private SpinService spinService;
-
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private SlotMachineConfig  slotMachineConfig;
 
     @Test
     void contextLoads() {
@@ -50,8 +51,10 @@ class SlotSimulationApplicationTests {
         var mockedBoard = new Board(testSymbols, testBoardLayoutConfig);
 
         try (MockedStatic<SlotUtil> utilities = Mockito.mockStatic(SlotUtil.class)) {
-            utilities.when(() -> SlotUtil.getNewBoard(anyList(), any(BoardLayoutConfig.class)))
+            utilities.when(() -> getNewBoard(anyList(), any(BoardLayoutConfig.class)))
                     .thenReturn(mockedBoard);
+            utilities.when(() -> computePayout(mockedBoard, 100, slotMachineConfig))
+                            .thenCallRealMethod();
             mockMvc.perform(get("/100"))
                     .andDo(print())
                     .andExpect(status().isOk())
