@@ -13,22 +13,28 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Map;
 
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.computeWin;
+import static org.example.slotsimulationinterview.slot.util.SlotUtil.formatPaylineEntry;
 import static org.example.slotsimulationinterview.slot.util.SlotUtil.getRandomIndex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 @ExtendWith(MockitoExtension.class)
-class SlotUtilTest {
+public class SlotUtilTest {
 
-    private List<String> testSymbols;
-    private List<List<Integer>> testPaylines;
-    private Map<Integer, Integer> testPayoutTable;
-    private BoardLayoutConfig testBoardLayoutConfig;
-    private Board testBoard;
-    private SlotMachineConfig testSlotMachineConfig;
+    private static List<String> symbols;
+    private static List<String> testSymbols;
+    private static List<List<Integer>> testPaylines;
+    private static Map<Integer, Integer> testPayoutTable;
+    private static BoardLayoutConfig testBoardLayoutConfig;
+    private static Board testBoard;
+    private static SlotMachineConfig testSlotMachineConfig;
+    private static final int testBetAmount = 100;
 
     @BeforeEach
     void setUp() {
 
+            symbols = List.of("9", "10", "J", "Q", "K", "A", "cat", "dog", "monkey", "bird");
             testPayoutTable = Map.of(3, 20, 4, 200, 5, 1000);
             testPaylines = List.of(
                     List.of(0, 3, 6, 9, 12),
@@ -47,7 +53,7 @@ class SlotUtilTest {
             testSymbols = List.of("J", "J", "J", "Q", "K", "cat", "J", "Q", "monkey", "bird", "bird", "bird", "J", "Q", "A");
             testBoard = new Board(testSymbols, testBoardLayoutConfig);
             testSlotMachineConfig = new SlotMachineConfig(
-                    testSymbols,
+                    symbols,
                     3,
                     testPaylines,
                     testPayoutTable,
@@ -58,7 +64,7 @@ class SlotUtilTest {
     void getNewBoard() {
         try (MockedStatic<SlotUtil> utilities = Mockito.mockStatic(SlotUtil.class)) {
             // Mock the randomized slot generation
-            utilities.when(() -> getRandomIndex(15))
+            utilities.when(() -> getRandomIndex(anyInt()))
                     .thenReturn(2) // J
                     .thenReturn(2) // J
                     .thenReturn(2) // J
@@ -67,18 +73,18 @@ class SlotUtilTest {
                     .thenReturn(6) // cat
                     .thenReturn(2) // J
                     .thenReturn(3) // Q
-                    .thenReturn(13)// monkey
-                    .thenReturn(14)// bird
-                    .thenReturn(14)// bird
-                    .thenReturn(14)// bird
+                    .thenReturn(8)// monkey
+                    .thenReturn(9)// bird
+                    .thenReturn(9)// bird
+                    .thenReturn(9)// bird
                     .thenReturn(2) // J
-                    .thenReturn(4) // J
-                    .thenReturn(5);// J
+                    .thenReturn(3) // Q
+                    .thenReturn(5);// A
 
-            utilities.when(() -> SlotUtil.getNewBoard(testSymbols, testBoardLayoutConfig))
+            utilities.when(() -> SlotUtil.getNewBoard(symbols, testBoardLayoutConfig))
                     .thenCallRealMethod();
 
-            var board = SlotUtil.getNewBoard(testSymbols, testBoardLayoutConfig);
+            var board = SlotUtil.getNewBoard(symbols, testBoardLayoutConfig);
             assertEquals(testBoard, board);
         }
     }
@@ -88,16 +94,16 @@ class SlotUtilTest {
         var testPayout = Map.of("0 3 6 9 12", 3, "0 4 8 10 12", 3);
         try (MockedStatic<SlotUtil> utilities = Mockito.mockStatic(SlotUtil.class)) {
 
-            utilities.when(() -> SlotUtil.computePayout(testBoard, 100, testSlotMachineConfig))
+            utilities.when(() -> SlotUtil.computePayout(testBoard, testBetAmount, testSlotMachineConfig))
                     .thenCallRealMethod();
-            utilities.when(() -> SlotUtil.formatPaylineEntry(List.of(0, 3, 6, 9, 12)))
+            utilities.when(() -> formatPaylineEntry(List.of(0, 3, 6, 9, 12)))
                     .thenCallRealMethod();
-            utilities.when(() -> SlotUtil.formatPaylineEntry(List.of(0, 4, 8, 10, 12)))
+            utilities.when(() -> formatPaylineEntry(List.of(0, 4, 8, 10, 12)))
                     .thenCallRealMethod();
-            utilities.when(() -> SlotUtil.computeWin(100, 3, testSlotMachineConfig.payoutTable()))
+            utilities.when(() -> computeWin(testBetAmount, 3, testSlotMachineConfig.payoutTable()))
                     .thenCallRealMethod();
 
-            var payout = SlotUtil.computePayout(testBoard, 100, testSlotMachineConfig);
+            var payout = SlotUtil.computePayout(testBoard, testBetAmount, testSlotMachineConfig);
             utilities.when(() -> SlotUtil.getPayoutsAsMap(payout))
                     .thenCallRealMethod();
             assertEquals(testPayout, SlotUtil.getPayoutsAsMap(payout));
@@ -106,9 +112,14 @@ class SlotUtilTest {
 
     @Test
     void getPayoutsAsMap() {
+        var testPayout = Map.of("0 3 6 9 12", 3, "0 4 8 10 12", 3);
+        var payout = SlotUtil.computePayout(testBoard, testBetAmount, testSlotMachineConfig);
+        assertEquals(testPayout, SlotUtil.getPayoutsAsMap(payout));
     }
 
     @Test
     void computeTotalWin() {
+        var payout = SlotUtil.computePayout(testBoard, testBetAmount, testSlotMachineConfig);
+        assertEquals(40, SlotUtil.computeTotalWin(payout));
     }
 }

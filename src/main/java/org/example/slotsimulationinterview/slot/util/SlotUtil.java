@@ -5,7 +5,11 @@ import org.example.slotsimulationinterview.slot.model.Board;
 import org.example.slotsimulationinterview.slot.config.BoardLayoutConfig;
 import org.example.slotsimulationinterview.slot.model.Payout;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class SlotUtil {
@@ -14,15 +18,15 @@ public class SlotUtil {
         return new Random().nextInt(min, max);
     }
 
-    static int getRandomIndex(int max) {
+    public static int getRandomIndex(int max) {
         return getRandomIndex(0, max);
     }
 
-    static String formatPaylineEntry(List<Integer> payline) {
-        return payline.stream().map(i -> i.toString()).collect(Collectors.joining(" "));
+    public static String formatPaylineEntry(List<Integer> payline) {
+        return payline.stream().map(Object::toString).collect(Collectors.joining(" "));
     }
 
-    static int computeWin(int betValue, int matches, Map<Integer, Integer> payout) {
+    public static int computeWin(int betValue, int matches, Map<Integer, Integer> payout) {
         return (betValue * payout.get(matches)) / 100;
     }
 

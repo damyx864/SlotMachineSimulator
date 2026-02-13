@@ -23,9 +23,9 @@ public class SpinServiceImpl implements SpinService {
     public SpinResult spin(int bet) {
         // Step 1: Generate a new board
         var board = getNewBoard(slotMachineConfig.symbols(), slotMachineConfig.boardLayout());
-        // Step 2: Compute the payoutTable
+        // Step 2: Compute the payout table
         var payouts = computePayout(board, bet, slotMachineConfig);
-        // Step 3: Build and return the response Dto
+        // Step 3: Build and return the response dto
         return SpinResult
                 .builder()
                 .board(board.spinSymbols())
