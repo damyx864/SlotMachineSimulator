@@ -1,0 +1,27 @@
+server:
+  port : 8080
+
+spring:
+  application:
+    name: SlotMachineSimulator
+  
+slot-machine:
+  identical-consecutive-symbols: 3
+  board-layout:
+    columns: 5
+    rows: 3
+    numbering:
+    - [0,3,6,9,12]
+    - [1,4,7,10,13]
+    - [2,5,8,11,14]
+  symbols: ["9", "10", "J", "Q", "K", "A", "cat", "dog", "monkey", "bird"]
+  payout-table:
+    3: 20
+    4: 200
+    5: 1000
+  paylines:
+    - [0,3,6,9,12]
+    - [1,4,7,10,13]
+    - [2,5,8,11,14]
+    - [0,4,8,10,12]
+    - [2,4,6,10,14]
